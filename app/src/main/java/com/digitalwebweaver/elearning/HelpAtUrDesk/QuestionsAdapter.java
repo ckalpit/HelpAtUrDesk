@@ -26,11 +26,12 @@ public class QuestionsAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView QuestionView, QuestionType, dateModified;
+
         QuestionView = (TextView) view.findViewById(R.id.questionView);
         QuestionType = (TextView) view.findViewById(R.id.questionTag);
         dateModified = (TextView) view.findViewById(R.id.dateModified);
         QuestionView.setText(cursor.getString(QuestionsFragment.COL_QUESTION));
-        QuestionType.setText(cursor.getString(QuestionsFragment.COL_QUESTION_TAG));
+        QuestionType.setText("#"+cursor.getString(QuestionsFragment.COL_QUESTION_TAG)+"  ");
         dateModified.setText(cursor.getString(QuestionsFragment.COL_MODIFIED_DATE));
     }
 }

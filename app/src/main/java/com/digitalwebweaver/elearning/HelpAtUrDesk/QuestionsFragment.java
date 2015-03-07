@@ -68,7 +68,7 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
         Bundle intent = getActivity().getIntent().getExtras();
         if (intent.containsKey("subjectNameSlug")) {
             subjectSlug = intent.getString("subjectNameSlug");
-            getActivity().setTitle("Questions List ("+subjectSlug+")");
+            getActivity().setTitle("Questions List (" + subjectSlug + ")");
         }
         mQuestionAdapter = new QuestionsAdapter(getActivity(), null, 0);
         final ListView listView = (ListView) rootView.findViewById(R.id.ListView_Questions);
@@ -92,7 +92,7 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onStart() {
         super.onStart();
-      //  updateQuestions();
+        //  updateQuestions();
     }
 
     private void updateQuestions() {
@@ -128,7 +128,7 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
                 QUESTION_VIEW_COLUMNS,
                 BlogPostEntry.COLUMN_POST_CATEGORY + " = ?",
                 new String[]{subjectSlug},
-                null);
+                BlogPostEntry.COLUMN_POST_MODIFIED + " DESC");
     }
 
     @Override
