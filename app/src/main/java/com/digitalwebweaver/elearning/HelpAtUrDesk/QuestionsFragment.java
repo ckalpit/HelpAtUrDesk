@@ -1,7 +1,6 @@
 package com.digitalwebweaver.elearning.HelpAtUrDesk;
 
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,7 +24,7 @@ import com.digitalwebweaver.elearning.HelpAtUrDesk.data.BlogPostContract.BlogPos
 public class QuestionsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int QUESTIONS_LOADER = 0;
-
+    public String questionId;
     private static final String[] QUESTION_VIEW_COLUMNS = {
             BlogPostEntry.TABLE_NAME + "." + BlogPostEntry._ID,
             BlogPostEntry.COLUMN_POST_TITLE,
@@ -43,6 +42,13 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
 
     private QuestionsAdapter mQuestionAdapter;
     private String subjectSlug;
+
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(String id);
+    }
 
     public QuestionsFragment() {
         setHasOptionsMenu(true);
@@ -79,9 +85,9 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("SELECTED_QUESTION", cursor.getString(COL_QUESTION_ID));
-                startActivity(intent);
+                questionId = cursor.getString(COL_QUESTION_ID);
+                ((Callback) getActivity()).onItemSelected(questionId);
+
             }
         });
         this.setHasOptionsMenu(true);

@@ -31,9 +31,16 @@ public class DetailActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
         if (savedInstanceState == null) {
+            Bundle intent = getIntent().getExtras();
+            Bundle args = new Bundle();
+            args.putString("SELECTED_QUESTION",intent.getString("SELECTED_QUESTION"));
+
+            AnswerFragment fragment = new AnswerFragment();
+            fragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new AnswerFragment())
+                    .add(R.id.answer_detail_container, fragment)
                     .commit();
 
         }
@@ -51,6 +58,7 @@ public class DetailActivity extends ActionBarActivity {
         private static final int ANSWER_LOADER = 0;
         private String mAnswerView;
         private String postUrl;
+        static final String SELECTED_QUESTION = "URI";
 
         private static final String[] ANSWER_VIEW_COLUMNS = {
                 BlogPostEntry._ID,
@@ -78,13 +86,17 @@ public class DetailActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             Bundle intent = getActivity().getIntent().getExtras();
-            View rootView = inflater.inflate(R.layout.fragment_detail_web_view, container, false);
-            if (intent != null) {
-                questionId = intent.getString("SELECTED_QUESTION");
-//                String answer = QuestionsFragment.getANSWERS(questionId);
-//                String text = Html.fromHtml(answer).toString(); simple text
-//                ((TextView) rootView.findViewById(R.id.DetailTextView)).setText(Html.fromHtml(answer));
+            Bundle arguments = getArguments();
+            if (arguments != null) {
+                questionId = arguments.getString("SELECTED_QUESTION");
             }
+            View rootView = inflater.inflate(R.layout.fragment_detail_web_view, container, false);
+//            if (intent != null) {
+//                questionId = intent.getString("SELECTED_QUESTION");
+////                String answer = QuestionsFragment.getANSWERS(questionId);
+////                String text = Html.fromHtml(answer).toString(); simple text
+////                ((TextView) rootView.findViewById(R.id.DetailTextView)).setText(Html.fromHtml(answer));
+//            }
 
             return rootView;
         }
@@ -122,15 +134,18 @@ public class DetailActivity extends ActionBarActivity {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-            Uri postUri = BlogPostEntry.CONTENT_URI;
-
-            return new CursorLoader(getActivity(),
-                    postUri,
-                    ANSWER_VIEW_COLUMNS,
-                    BlogPostEntry._ID + " = ?",
-                    new String[]{questionId},
-                    null);
-
+            Intent intent = getActivity().getIntent();
+            if ((intent == null || intent.getData() == null) && questionId == null) {
+                return null;
+            } else {
+                Uri postUri = BlogPostEntry.CONTENT_URI;
+                return new CursorLoader(getActivity(),
+                        postUri,
+                        ANSWER_VIEW_COLUMNS,
+                        BlogPostEntry._ID + " = ?",
+                        new String[]{questionId},
+                        null);
+            }
         }
 
         @Override
@@ -155,7 +170,7 @@ public class DetailActivity extends ActionBarActivity {
 
             myWebView.setClickable(false);
 
-            myWebView.loadDataWithBaseURL(null, "<strong>Question:</strong> " + question + "<br><br>" + "<strong>Answer:</strong>\n" +answer, "text/html", "utf-8", null);
+            myWebView.loadDataWithBaseURL(null, "<strong>Question:</strong> " + question + "<br><br>" + "<strong>Answer:</strong>\n" + answer, "text/html", "utf-8", null);
             if (mShareActionProvider != null) {
                 mShareActionProvider.setShareIntent(createShareForecastIntent());
             }
