@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:id="@+id/list_item_questions_textview"
     android:gravity="center_vertical"
     android:textSize="18dp"
@@ -11,8 +12,6 @@
     android:paddingBottom="6dp"
     android:textColor="#6666CC"
     android:shadowColor="#66CCCC"
-    android:shadowDx="0"
-    android:shadowDy="0"
     android:shadowRadius="50"
     >
 
