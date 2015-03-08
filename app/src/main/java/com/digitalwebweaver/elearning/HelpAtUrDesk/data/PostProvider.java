@@ -7,9 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
-
-import com.digitalwebweaver.elearning.HelpAtUrDesk.service.HelpAtUrDeskService;
-
 /**
  * Created by k on 3/4/2015.
  */
@@ -17,7 +14,7 @@ public class PostProvider extends ContentProvider {
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private PostDbHelper mOpenHelper;
-
+    public static final String SQL_INSERT_OR_REPLACE = "__sql_insert_or_replace__";
     static final int POSTS = 100;
     static final int POST_WITH_CATEGORY = 101;
     static final int POST_WITH_CATEGORY_AND_TAG = 102;
@@ -131,14 +128,14 @@ public class PostProvider extends ContentProvider {
         Uri returnUri = null;
         boolean replace = false;
         long _id;
-        if (contentValues.containsKey(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE)) {
-            replace = contentValues.getAsBoolean(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE);
+        if (contentValues.containsKey(SQL_INSERT_OR_REPLACE)) {
+            replace = contentValues.getAsBoolean(SQL_INSERT_OR_REPLACE);
             // Clone the values object, so we don't modify the original.
             // This is not strictly necessary, but depends on your needs
             contentValues = new ContentValues(contentValues);
 
             // Remove the key, so we don't pass that on to db.insert() or db.replace()
-            contentValues.remove(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE);
+            contentValues.remove(SQL_INSERT_OR_REPLACE);
         }
 
         switch (match) {
@@ -201,14 +198,14 @@ public class PostProvider extends ContentProvider {
                 try {
                     for (ContentValues value : values) {
 
-                        if (value.containsKey(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE)) {
-                            replace = value.getAsBoolean(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE);
+                        if (value.containsKey(SQL_INSERT_OR_REPLACE)) {
+                            replace = value.getAsBoolean(SQL_INSERT_OR_REPLACE);
                             // Clone the values object, so we don't modify the original.
                             // This is not strictly necessary, but depends on your needs
                             value = new ContentValues(value);
 
                             // Remove the key, so we don't pass that on to db.insert() or db.replace()
-                            value.remove(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE);
+                            value.remove(SQL_INSERT_OR_REPLACE);
                         }
                         if (replace) {
                             _id = db.replace(BlogPostContract.BlogPostEntry.TABLE_NAME, null, value);

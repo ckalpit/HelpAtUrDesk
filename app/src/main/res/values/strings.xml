@@ -9,5 +9,7 @@
     <string name="title_activity_dashboard">"Dashboard "</string>
     <string name="action_refresh">refresh</string>
     <string name="action_share">Share</string>
+    <string name="sync_account_type">helpaturdesk.example.com</string>
+    <string name="content_authority">com.digitalwebweaver.elearning.HelpAtUrDesk</string>
 
 </resources>
