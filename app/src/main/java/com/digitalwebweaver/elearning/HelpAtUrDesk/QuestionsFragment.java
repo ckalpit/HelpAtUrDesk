@@ -25,6 +25,9 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
 
     private static final int QUESTIONS_LOADER = 0;
     public String questionId;
+    private int mPosition = ListView.INVALID_POSITION;
+
+    private static final String SELECTED_KEY = "selected_position";
     private static final String[] QUESTION_VIEW_COLUMNS = {
             BlogPostEntry.TABLE_NAME + "." + BlogPostEntry._ID,
             BlogPostEntry.COLUMN_POST_TITLE,
@@ -39,7 +42,7 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
     static final int COL_MODIFIED_DATE = 2;
     static final int COL_QUESTION_TAG = 3;
 
-
+    ListView mListView;
     private QuestionsAdapter mQuestionAdapter;
     private String subjectSlug;
 
@@ -77,22 +80,39 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
             getActivity().setTitle("Questions List (" + subjectSlug + ")");
         }
         mQuestionAdapter = new QuestionsAdapter(getActivity(), null, 0);
-        final ListView listView = (ListView) rootView.findViewById(R.id.ListView_Questions);
-        listView.setAdapter(mQuestionAdapter);
+        mListView = (ListView) rootView.findViewById(R.id.ListView_Questions);
+        mListView.setAdapter(mQuestionAdapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
                 questionId = cursor.getString(COL_QUESTION_ID);
                 ((Callback) getActivity()).onItemSelected(questionId);
+                mPosition = i;
 
             }
         });
-        this.setHasOptionsMenu(true);
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The listview probably hasn't even been populated yet.  Actually perform the
+            // swapout in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
         return rootView;
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // When tablets rotate, the currently selected list item needs to be saved.
+        // When no item is selected, mPosition will be set to Listview.INVALID_POSITION,
+        // so check for that before storing.
+        if (mPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -101,10 +121,10 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
         //  updateQuestions();
     }
 
-    private void updateQuestions() {
-        FetchPostsTask questionsTask = new FetchPostsTask(getActivity());
-        questionsTask.execute("4");
-    }
+//    private void updateQuestions() {
+//        FetchPostsTask questionsTask = new FetchPostsTask(getActivity());
+//        questionsTask.execute("4");
+//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -144,6 +164,11 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
             return;
         }
         mQuestionAdapter.swapCursor(data);
+        if (mPosition != ListView.INVALID_POSITION) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            // to, do so now.
+            mListView.smoothScrollToPosition(mPosition);
+        }
     }
 
     @Override

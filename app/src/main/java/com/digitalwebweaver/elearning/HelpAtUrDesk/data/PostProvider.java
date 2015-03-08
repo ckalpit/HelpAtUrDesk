@@ -7,7 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
-import com.digitalwebweaver.elearning.HelpAtUrDesk.FetchPostsTask;
+
+import com.digitalwebweaver.elearning.HelpAtUrDesk.service.HelpAtUrDeskService;
 
 /**
  * Created by k on 3/4/2015.
@@ -130,14 +131,14 @@ public class PostProvider extends ContentProvider {
         Uri returnUri = null;
         boolean replace = false;
         long _id;
-        if (contentValues.containsKey(FetchPostsTask.SQL_INSERT_OR_REPLACE)) {
-            replace = contentValues.getAsBoolean(FetchPostsTask.SQL_INSERT_OR_REPLACE);
+        if (contentValues.containsKey(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE)) {
+            replace = contentValues.getAsBoolean(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE);
             // Clone the values object, so we don't modify the original.
             // This is not strictly necessary, but depends on your needs
             contentValues = new ContentValues(contentValues);
 
             // Remove the key, so we don't pass that on to db.insert() or db.replace()
-            contentValues.remove(FetchPostsTask.SQL_INSERT_OR_REPLACE);
+            contentValues.remove(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE);
         }
 
         switch (match) {
@@ -200,14 +201,14 @@ public class PostProvider extends ContentProvider {
                 try {
                     for (ContentValues value : values) {
 
-                        if (value.containsKey(FetchPostsTask.SQL_INSERT_OR_REPLACE)) {
-                            replace = value.getAsBoolean(FetchPostsTask.SQL_INSERT_OR_REPLACE);
+                        if (value.containsKey(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE)) {
+                            replace = value.getAsBoolean(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE);
                             // Clone the values object, so we don't modify the original.
                             // This is not strictly necessary, but depends on your needs
                             value = new ContentValues(value);
 
                             // Remove the key, so we don't pass that on to db.insert() or db.replace()
-                            value.remove(FetchPostsTask.SQL_INSERT_OR_REPLACE);
+                            value.remove(HelpAtUrDeskService.SQL_INSERT_OR_REPLACE);
                         }
                         if (replace) {
                             _id = db.replace(BlogPostContract.BlogPostEntry.TABLE_NAME, null, value);

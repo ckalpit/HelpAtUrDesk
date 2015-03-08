@@ -35,6 +35,8 @@
             android:name=".data.PostProvider"
             android:exported="false"
             android:syncable="true" />
+
+        <service android:name=".service.HelpAtUrDeskService"/>
     </application>
 
 </manifest>
