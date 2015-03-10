@@ -10,20 +10,20 @@ import android.util.Log;
  */
 public class HelpAtUrDeskSyncService extends Service {
     private static final Object sSyncAdapterLock = new Object();
-    private static HelpAtUrDeskSyncAdapter sSunshineSyncAdapter = null;
+    private static HelpAtUrDeskSyncAdapter sHelpAtUrDeskSyncAdapter = null;
 
     @Override
     public void onCreate() {
-        Log.d("SunshineSyncService", "onCreate - SunshineSyncService");
+        Log.d("HelpAtUrDeskSyncService", "onCreate - HelpAtUrDeskSyncService");
         synchronized (sSyncAdapterLock) {
-            if (sSunshineSyncAdapter == null) {
-                sSunshineSyncAdapter = new HelpAtUrDeskSyncAdapter(getApplicationContext(), true);
+            if (sHelpAtUrDeskSyncAdapter == null) {
+                sHelpAtUrDeskSyncAdapter = new HelpAtUrDeskSyncAdapter(getApplicationContext(), true);
             }
         }
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return sSunshineSyncAdapter.getSyncAdapterBinder();
+        return sHelpAtUrDeskSyncAdapter.getSyncAdapterBinder();
     }
 }

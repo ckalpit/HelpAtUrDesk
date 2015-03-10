@@ -35,7 +35,7 @@ public class DetailActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             Bundle intent = getIntent().getExtras();
             Bundle args = new Bundle();
-            args.putString("SELECTED_QUESTION",intent.getString("SELECTED_QUESTION"));
+            args.putString("SELECTED_QUESTION", intent.getString("SELECTED_QUESTION"));
 
             AnswerFragment fragment = new AnswerFragment();
             fragment.setArguments(args);
@@ -58,7 +58,7 @@ public class DetailActivity extends ActionBarActivity {
         private static final int ANSWER_LOADER = 0;
         private String mAnswerView;
         private String postUrl;
-        static final String SELECTED_QUESTION = "URI";
+
 
         private static final String[] ANSWER_VIEW_COLUMNS = {
                 BlogPostEntry._ID,
@@ -77,7 +77,6 @@ public class DetailActivity extends ActionBarActivity {
             super.onActivityCreated(savedInstanceState);
         }
 
-        //  private static String[] answers;
         public AnswerFragment() {
             setHasOptionsMenu(true);
         }
@@ -85,18 +84,11 @@ public class DetailActivity extends ActionBarActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            Bundle intent = getActivity().getIntent().getExtras();
             Bundle arguments = getArguments();
             if (arguments != null) {
                 questionId = arguments.getString("SELECTED_QUESTION");
             }
             View rootView = inflater.inflate(R.layout.fragment_detail_web_view, container, false);
-//            if (intent != null) {
-//                questionId = intent.getString("SELECTED_QUESTION");
-////                String answer = QuestionsFragment.getANSWERS(questionId);
-////                String text = Html.fromHtml(answer).toString(); simple text
-////                ((TextView) rootView.findViewById(R.id.DetailTextView)).setText(Html.fromHtml(answer));
-//            }
 
             return rootView;
         }
@@ -157,22 +149,25 @@ public class DetailActivity extends ActionBarActivity {
             String question = data.getString(COL_POST_TILE);
             String answer = data.getString(COL_POST_CONTENT);
             postUrl = data.getString(COL_POST_URL);
-            mAnswerView = "Q: " + question + "/\n/\n" + "Answer: " + answer;
-//            ((TextView) getView().findViewById(R.id.DetailTextView)).setText("Question: " + question + "\n\n" + "Answer:\n" + Html.fromHtml(answer));
-            // If onCreateOptionsMenu has already happened, we need to update the share intent now.
-            WebView myWebView = (WebView) getView().findViewById(R.id.answerWebView);
-            myWebView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    return true;
+            mAnswerView = "<strong>Question:</strong> " + question + "<br><br><strong>Answer:</strong><br>" + answer;
+            try {
+                WebView myWebView = (WebView) getView().findViewById(R.id.answerWebView);
+                myWebView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        return true;
+                    }
+                });
+
+                myWebView.setClickable(false);
+
+                myWebView.loadDataWithBaseURL(null, mAnswerView, "text/html", "utf-8", null);
+                if (mShareActionProvider != null) {
+                    mShareActionProvider.setShareIntent(createShareForecastIntent());
                 }
-            });
-
-            myWebView.setClickable(false);
-
-            myWebView.loadDataWithBaseURL(null, "<strong>Question:</strong> " + question + "<br><br>" + "<strong>Answer:</strong>\n" + answer, "text/html", "utf-8", null);
-            if (mShareActionProvider != null) {
-                mShareActionProvider.setShareIntent(createShareForecastIntent());
+            }catch (NullPointerException e){
+                e.printStackTrace();
+                Log.d("Detail Activity","Web View null pointer exception");
             }
         }
 

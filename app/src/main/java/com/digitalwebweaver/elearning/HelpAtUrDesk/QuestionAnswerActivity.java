@@ -38,7 +38,6 @@ public class QuestionAnswerActivity extends ActionBarActivity implements Questio
     @Override
     protected void onResume() {
         super.onResume();
-        QuestionsFragment myQuestionsFragment = (QuestionsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_questions);
     }
 
 

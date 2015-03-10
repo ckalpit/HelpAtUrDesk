@@ -32,9 +32,6 @@ public class PostProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, BlogPostContract.PATH_BLOG_POST, POSTS);
-//        matcher.addURI(authority, BlogPostContract.PATH_BLOG_POST, POST_WITH_CATEGORY);
-//        matcher.addURI(authority, BlogPostContract.PATH_BLOG_POST, POST_WITH_CATEGORY_AND_TAG);
-//        matcher.addURI(authority, BlogPostContract.PATH_BLOG_POST, POSTS_ANSWER);
 
         return matcher;
     }
@@ -145,18 +142,12 @@ public class PostProvider extends ContentProvider {
                 } else {
                     _id = db.insert(BlogPostContract.BlogPostEntry.TABLE_NAME, null, contentValues);
                 }
-//                _id = db.insert(BlogPostContract.BlogPostEntry.TABLE_NAME, null, contentValues);
                 if (_id > 0)
                     returnUri = BlogPostContract.BlogPostEntry.buildPostsUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             default:
-//                _id = db.insert(BlogPostContract.BlogPostEntry.TABLE_NAME, null, contentValues);
-//                if (_id > 0)
-//                    returnUri = BlogPostContract.BlogPostEntry.buildPostsUri(_id);
-//                else
-                //throw new android.database.SQLException("Failed to insert row into " + uri);
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
@@ -212,7 +203,6 @@ public class PostProvider extends ContentProvider {
                         } else {
                             _id = db.insert(BlogPostContract.BlogPostEntry.TABLE_NAME, null, value);
                         }
-//                        long _id = db.insert(BlogPostContract.BlogPostEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }

@@ -37,8 +37,8 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
     private static int pageCount = 0;
     public static final String SQL_INSERT_OR_REPLACE = "__sql_insert_or_replace__";
 
-    // Interval at which to sync with the weather, in seconds.
-    // 60 seconds (1 minute) * 180 = 3 hours
+    // Interval at which to sync with the blog posts, in seconds.
+    // 60 seconds (1 minute) * 180 = 3 hours *3 = 9 hours
     public static final int SYNC_INTERVAL = 60 * 180 * 3;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
 
@@ -83,7 +83,7 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
                 defaultPage++;
                 URL url = new URL(builtUri.toString());
 
-                // Create the request to OpenWeatherMap, and open the connection
+                // Create the request to blog posts, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
@@ -114,7 +114,7 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
             } while (pageCount + 1 != defaultPage);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attemping
+            // If the code didn't successfully get the data, there's no point in attemping
             // to parse it.
             return;
         } catch (JSONException e) {
@@ -149,7 +149,6 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // These are the names of the JSON objects that need to be extracted.
         final String QUESTION_ANSWER_OBJECT = "posts";
-//        final String QUESTION_ANSWER_OBJECT_COUNT= "count";
         final String QUESTION_TITLE = "title";
         final String POST_LINK = "url";
         final String ANSWER_TITLE = "content";
@@ -161,9 +160,8 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             JSONObject questionAnswerInfoJson = new JSONObject(questionAnswerInfoJsonStr);
             JSONArray postsArray = questionAnswerInfoJson.getJSONArray(QUESTION_ANSWER_OBJECT);
-//            int count = questionAnswerInfoJson.getInt(QUESTION_ANSWER_OBJECT_COUNT);
             pageCount = questionAnswerInfoJson.getInt("pages");
-            // Insert the new weather information into the database
+            // Insert the new post information into the database
             Vector<ContentValues> cVVector = new Vector<ContentValues>(postsArray.length());
             for (int i = 0; i < postsArray.length(); i++) {
                 // Get the JSON object representing the day
@@ -294,6 +292,7 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
              * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
+            onAccountCreated(newAccount, context);
 
         }
         return newAccount;

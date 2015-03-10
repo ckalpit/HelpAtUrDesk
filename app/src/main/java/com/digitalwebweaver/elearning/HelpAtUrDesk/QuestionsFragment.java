@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.digitalwebweaver.elearning.HelpAtUrDesk.data.BlogPostContract.BlogPostEntry;
+import com.digitalwebweaver.elearning.HelpAtUrDesk.sync.HelpAtUrDeskSyncAdapter;
 
 
 public class QuestionsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -57,11 +58,6 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
         setHasOptionsMenu(true);
     }
 
-    public static String getANSWERS(int position) {
-//        return ANSWERS[questionId];
-        return "1";
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(QUESTIONS_LOADER, null, this);
@@ -73,7 +69,6 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-//        List<String> Questions = new ArrayList<String>(Arrays.asList(question));
         Bundle intent = getActivity().getIntent().getExtras();
         if (intent.containsKey("subjectNameSlug")) {
             subjectSlug = intent.getString("subjectNameSlug");
@@ -118,13 +113,8 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onStart() {
         super.onStart();
-        //  updateQuestions();
     }
 
-//    private void updateQuestions() {
-//        FetchPostsTask questionsTask = new FetchPostsTask(getActivity());
-//        questionsTask.execute("4");
-//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -138,8 +128,7 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-//            FetchQuestionsTask weatherTask = new FetchQuestionsTask();
-//            weatherTask.execute("ds");
+            HelpAtUrDeskSyncAdapter.syncImmediately(getActivity());
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -148,13 +137,13 @@ public class QuestionsFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         Uri postUri = BlogPostEntry.CONTENT_URI;
-
+        String SortOrder = BlogPostEntry.COLUMN_POST_MODIFIED + " DESC";
         return new CursorLoader(getActivity(),
                 postUri,
                 QUESTION_VIEW_COLUMNS,
                 BlogPostEntry.COLUMN_POST_CATEGORY + " = ?",
                 new String[]{subjectSlug},
-                BlogPostEntry.COLUMN_POST_MODIFIED + " DESC");
+                SortOrder);
     }
 
     @Override
