@@ -2,18 +2,30 @@ package com.digitalwebweaver.elearning.HelpAtUrDesk.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import com.digitalwebweaver.elearning.HelpAtUrDesk.DashboardActivity;
 import com.digitalwebweaver.elearning.HelpAtUrDesk.R;
 import com.digitalwebweaver.elearning.HelpAtUrDesk.data.BlogPostContract;
 
@@ -41,6 +53,8 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
     // 60 seconds (1 minute) * 180 = 3 hours *3 = 9 hours
     public static final int SYNC_INTERVAL = 60 * 180 * 3;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+    private static final int HAUD_NOTIFICATION_ID = 8949;
+    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 
     public HelpAtUrDeskSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -140,7 +154,7 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Take the String representing the complete forecast in JSON Format and
      * pull out the data we need to construct the Strings needed for the wireframes.
-     * <p/>
+     * <p>
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
@@ -187,6 +201,7 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
                 PostValues.put(BlogPostContract.BlogPostEntry.COLUMN_POST_ATTACHMENTS, attachments);
 
                 cVVector.add(PostValues);
+                notifyUserQnAUpdates();
             }
 
             int inserted = 0;
@@ -202,6 +217,59 @@ public class HelpAtUrDeskSyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
+        }
+    }
+
+    private void notifyUserQnAUpdates() {
+        Context context = getContext();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String lastNotificationKey = context.getString(R.string.pref_last_notification);
+        long lastSync = prefs.getLong(lastNotificationKey, 0);
+
+        if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
+            // Last sync was more than 1 day ago, let's send a notification.
+
+            Resources resources = context.getResources();
+            String title = context.getString(R.string.app_name);
+
+            // Define the text
+            String contentText = "Question And Answeres are up-to date.";
+
+            // NotificationCompatBuilder is a very convenient way to build backward-compatible
+            // notifications.  Just throw in some data.
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(getContext())
+                            .setSmallIcon(R.drawable.ic_launcher)
+                            .setContentTitle(title)
+                            .setContentText(contentText);
+
+            // Make something interesting happen when the user clicks on the notification.
+            // In this case, opening the app is sufficient.
+            Intent resultIntent = new Intent(context, DashboardActivity.class);
+
+            // The stack builder object will contain an artificial back stack for the
+            // started Activity.
+            // This ensures that navigating backward from the Activity leads out of
+            // your application to the Home screen.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            // HAUD_NOTIFICATION_ID allows you to update the notification later on.
+            mNotificationManager.notify(HAUD_NOTIFICATION_ID, mBuilder.build());
+
+            //refreshing last sync
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putLong(lastNotificationKey, System.currentTimeMillis());
+            editor.commit();
         }
     }
 
